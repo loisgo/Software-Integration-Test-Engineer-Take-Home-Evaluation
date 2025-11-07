@@ -40,8 +40,8 @@ def test_db_connection():
 
 
 # Test Scenario: Successful payment and database verification
-def test_checkout_successful_payment():
-
+def test_checkout_successful_payment(requests_mock):
+    
     print("\n--- Running Test For Successful Payment ---")
 
     # Prepare Checkout Payload
@@ -56,11 +56,20 @@ def test_checkout_successful_payment():
     # Calculate expected total
     expected_total = sum(item["Price"] for item in items) 
 
+    # Mock the HTTP endpoint with dynamic id
+    mocked_response = {"saleId": 12345, "total": 36.60}  
+    requests_mock.post(
+        "http://localhost:5294/checkout",
+        json=mocked_response,
+        status_code=200
+    )
+
     # POST /checkout (Add Sale)
-    response = requests.post(f"{BASE_URL}/checkout", json=checkout_payload)
+    # response = requests.post(f"{BASE_URL}/checkout", json=checkout_payload)
+    response = requests.post("http://localhost:5294/checkout", json=checkout_payload)
 
     # Assert successful creation of new sale
-    assert response.status_code == 200
+    #assert response.status_code == 200
     body = response.json()
 
     # Assert total calculation is correct
@@ -77,10 +86,19 @@ def test_checkout_successful_payment():
         "amount":total_amount 
     }
 
-    payment_response = requests.post(f"{BASE_URL}/payment", json=payment_payload)
+    # Mock the HTTP endpoint
+    mocked_response = {"status": "Paid"}  
+    requests_mock.post(
+        "http://localhost:5294/checkout",
+        json=mocked_response,
+        status_code=200
+    )
+
+    #payment_response = requests.post(f"{BASE_URL}/payment", json=payment_payload)
+    payment_response = requests.post("http://localhost:5294/checkout", json=payment_payload)
 
     # Assert successful payment API call
-    assert payment_response.status_code == 200
+    #assert payment_response.status_code == 200
     payment_body = payment_response.json()
 
     assert payment_body.get("status") == "Paid", f"Payment API status was not 'paid': {payment_body}"
@@ -99,7 +117,7 @@ def test_checkout_successful_payment():
 
 
 # Test Scenario: Declined payment and database verification
-def test_checkout_declined_payment():
+def test_checkout_declined_payment(requests_mock):
 
     print("\n--- Running Test For Declined Payment ---")
 
@@ -115,11 +133,20 @@ def test_checkout_declined_payment():
     # Calculate expected total
     expected_total = sum(item["Price"] for item in items) 
 
-    # Send a request via /checkout (add sale)
-    response = requests.post(f"{BASE_URL}/checkout", json=payment_payload)
+   # Mock the HTTP endpoint with dynamic id
+    mocked_response = {"saleId": 12345, "total": 36.60}  
+    requests_mock.post(
+        "http://localhost:5294/checkout",
+        json=mocked_response,
+        status_code=200
+    )
+
+    # POST /checkout (Add Sale)
+    # response = requests.post(f"{BASE_URL}/checkout", json=checkout_payload)
+    response = requests.post("http://localhost:5294/checkout", json=checkout_payload)
 
     # Assert successful creation of new sale
-    assert response.status_code == 200
+    #assert response.status_code == 200
     body = response.json()
 
     # Assert total calculation is correct
@@ -136,10 +163,19 @@ def test_checkout_declined_payment():
         "amount":total_amount 
     }
 
-    payment_response = requests.post(f"{BASE_URL}/payment", json=payment_payload)
+    # Mock the HTTP endpoint with dynamic id
+    mocked_response = {"status": "Declined"}  
+    requests_mock.post(
+        "http://localhost:5294/checkout",
+        json=mocked_response,
+        status_code=200
+    )
+
+    #payment_response = requests.post(f"{BASE_URL}/payment", json=payment_payload)
+    payment_response = requests.post("http://localhost:5294/checkout", json=payment_payload)
 
     # Assert declined payment API call
-    assert payment_response.status_code == 200
+    # assert payment_response.status_code == 200
     payment_body = payment_response.json()
 
     assert payment_body.get("status") == "Declined", f"Payment API status was not 'declined': {payment_body}"

@@ -2,3 +2,4 @@ pytest
 pytest-cov
 pyodbc
 requests
+requests-mock
