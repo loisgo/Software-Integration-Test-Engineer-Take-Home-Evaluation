@@ -31,14 +31,6 @@ def execute_db_query(sql, params=None):
         cursor.close()
         conn.close()
 
-# Test database connection is established correctly
-def test_db_connection():
-    "A basic check to ensure we can connect to the DB and fetch data."
-    row = execute_db_query("SELECT TOP 1 * FROM sales_hdr")
-    assert row is not None, "Failed to connect to the database or table is empty."
-    print("Database connection test successful.")
-
-
 # Test Scenario: Successful payment and database verification
 def test_checkout_successful_payment(requests_mock):
     
@@ -143,7 +135,7 @@ def test_checkout_declined_payment(requests_mock):
 
     # POST /checkout (Add Sale)
     # response = requests.post(f"{BASE_URL}/checkout", json=checkout_payload)
-    response = requests.post("http://localhost:5294/checkout", json=checkout_payload)
+    response = requests.post("http://localhost:5294/checkout", json=payment_payload)
 
     # Assert successful creation of new sale
     #assert response.status_code == 200

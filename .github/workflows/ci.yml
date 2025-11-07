@@ -37,16 +37,7 @@ jobs:
                      --name sqlserver-test \
                      -d mcr.microsoft.com/mssql/server:2022-latest
 
-      # 5. Wait for SQL Server to be ready
-      - name: Wait for SQL Server to be ready
-        run: |
-          for i in {1..30}; do
-            /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${{ secrets.SA_PASSWORD }} -Q "SELECT 1" && break
-            echo "Waiting for SQL Server..."
-            sleep 5
-          done
-
-      # 6: Install driver
+      # 5: Install driver
       - name: Install SQL Server ODBC Driver
         run: |
           sudo apt-get update
@@ -57,7 +48,22 @@ jobs:
           sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
           sudo apt-get install -y unixodbc-dev
 
-      # 7. Run pytest with coverage
+      # 6. Wait for SQL Server to be ready
+      - name: Wait for SQL Server to be ready
+        run: |
+          for i in {1..30}; do
+            /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${{ secrets.SA_PASSWORD }} -Q "SELECT 1" && break
+            echo "Waiting for SQL Server..."
+            sleep 5
+          done
+
+      # 7: Create database
+      - name: Create MySalesDB
+        run: |
+          /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${{ secrets.SA_PASSWORD }} \
+              -Q "IF DB_ID('MySalesDB') IS NULL CREATE DATABASE MySalesDB;"
+
+      # 8. Run pytest with coverage
       - name: Run tests
         run: |
           mkdir -p reports
@@ -67,7 +73,7 @@ jobs:
                 --cov-fail-under=70 \
                 --cov-report term-missing
 
-      # 8. Upload reports
+      # 9. Upload reports
       - name: Upload reports
         uses: actions/upload-artifact@v4
         with:
