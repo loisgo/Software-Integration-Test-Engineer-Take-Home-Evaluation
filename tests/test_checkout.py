@@ -38,18 +38,23 @@ def insert_test_sale(total, payment_status="Paid"):
     conn = pyodbc.connect(DB_CONN_STR)
     cursor = conn.cursor()
     try:
+        # 1. Execute the INSERT statement
         cursor.execute(
             "INSERT INTO sales_hdr (sale_date, total, payment_status) VALUES (?, ?, ?)",
             (datetime.now(), total, payment_status)
         )
-        conn.commit()
+        # 2. IMMEDIATELY retrieve the ID using SCOPE_IDENTITY()
+        # Note: Do NOT use conn.commit() between the insert and the select,
+        # as it can interfere with SCOPE_IDENTITY.
         cursor.execute("SELECT SCOPE_IDENTITY()")
         new_id = cursor.fetchone()[0]
+        
+        # 3. Commit the transaction after retrieval
+        conn.commit()
         return new_id
     finally:
         cursor.close()
         conn.close()
-
 
 # --- Tests --- #
 
