@@ -47,15 +47,17 @@ def insert_test_sale(total, payment_status="Paid"):
             (datetime.now(), total, payment_status)
         )
         
-        # Immediately fetch the ID
+        # Immediately fetch the new ID
         cursor.execute("SELECT CAST(SCOPE_IDENTITY() AS INT) AS new_id")
         new_id = cursor.fetchone()[0]
         
+        # Commit transaction
         conn.commit()
         return new_id
     finally:
         cursor.close()
         conn.close()
+
 
 
 # --- Tests --- #
