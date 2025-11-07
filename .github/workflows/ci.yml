@@ -50,7 +50,11 @@ jobs:
       - name: Run tests
         run: |
           mkdir -p reports
-          pytest --junitxml=reports/junit.xml --cov=. --cov-report xml:reports/coverage.xml --cov-fail-under=70
+          pytest --junitxml=reports/junit.xml \
+                --cov=./ \
+                --cov-report xml:reports/coverage.xml \
+                --cov-fail-under=70 \
+                --cov-report term-missing
 
       # 7. Upload reports
       - name: Upload reports
