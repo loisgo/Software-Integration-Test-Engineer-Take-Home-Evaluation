@@ -1,0 +1,5 @@
+requests
+pyodbc
+pytest
+pytest-cov
+pytest-junitxml

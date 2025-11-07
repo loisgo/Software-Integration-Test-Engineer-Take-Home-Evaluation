@@ -1,0 +1,51 @@
+trigger:
+- main
+
+variables:
+  buildConfiguration: 'Release'
+
+pool:
+  vmImage: 'windows-latest'
+
+steps:
+
+# 1. Checkout
+- checkout: self
+
+# 2. Spin up Docker compose (SQL Server + PaymentGatewayMock)
+- task: DockerInstaller@0
+  displayName: 'Install Docker'
+
+- script: docker compose -f docker-compose.yml up -d
+  displayName: 'Start containers'
+
+# 3. .NET restore & build
+- task: DotNetCoreCLI@2
+  displayName: 'Restore'
+  inputs:
+    command: restore
+    projects: '**/*.csproj'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Build'
+  inputs:
+    command: build
+    arguments: '--configuration $(buildConfiguration)'
+
+# 4. Run tests (TODO: replace with pytest/nunit/etc. if needed)
+- task: DotNetCoreCLI@2
+  displayName: 'Test'
+  inputs:
+    command: test
+    arguments: '--configuration $(buildConfiguration) --logger trx'
+
+# 5. Publish test results
+- task: PublishTestResults@2
+  inputs:
+    testResultsFormat: 'VSTest'
+    testResultsFiles: '**/*.trx'
+
+# 6. (Optional) Fail build if coverage < 70%
+# - script: |
+#     echo "TODO: Parse coverage.xml and fail if below threshold"
+#   displayName: 'Coverage gate'
