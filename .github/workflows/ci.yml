@@ -48,8 +48,8 @@ jobs:
           sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18 mssql-tools
           sudo apt-get install -y unixodbc-dev
 
-          # Add sqlcmd to PATH
-          echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> $GITHUB_ENV
+          # Add sqlcmd to PATH for all subsequent steps
+          echo "PATH=$PATH:/opt/mssql-tools/bin" >> $GITHUB_ENV
 
       # 6. Wait for SQL Server to be ready
       - name: Wait for SQL Server to be ready
