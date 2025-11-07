@@ -66,7 +66,12 @@ jobs:
           /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${{ secrets.SA_PASSWORD }} \
               -Q "IF DB_ID('MySalesDB') IS NULL CREATE DATABASE MySalesDB;"
 
-      # 8. Run pytest with coverage
+      # 8: Create tables
+      - name: Create database schema
+        run: |
+          sqlcmd -S localhost -U SA -P ${{ secrets.SA_PASSWORD }} -d MySalesDB -i schema.sql
+
+      # 9. Run pytest with coverage
       - name: Run tests
         run: |
           mkdir -p reports
@@ -76,7 +81,7 @@ jobs:
                 --cov-fail-under=70 \
                 --cov-report term-missing
 
-      # 9. Upload reports
+      # 10. Upload reports
       - name: Upload reports
         uses: actions/upload-artifact@v4
         with:
