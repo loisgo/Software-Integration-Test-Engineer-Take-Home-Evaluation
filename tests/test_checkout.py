@@ -20,7 +20,10 @@ def execute_db_query(sql, params=None):
     conn = pyodbc.connect(DB_CONN_STR)
     cursor = conn.cursor()
     try:
-        if params:
+        if params is not None:
+            # Ensure params is a tuple
+            if not isinstance(params, (tuple, list)):
+                params = (params,)
             cursor.execute(sql, params)
         else:
             cursor.execute(sql)
