@@ -38,20 +38,25 @@ def insert_test_sale(total, payment_status="Paid"):
     conn = pyodbc.connect(DB_CONN_STR)
     cursor = conn.cursor()
     try:
+        # Prevent extra "rows affected" messages
+        cursor.execute("SET NOCOUNT ON;")
+        
+        # Insert the sale
         cursor.execute(
-            """
-            INSERT INTO sales_hdr (sale_date, total, payment_status)
-            VALUES (?, ?, ?);
-            SELECT CAST(SCOPE_IDENTITY() AS INT) AS new_id;
-            """,
+            "INSERT INTO sales_hdr (sale_date, total, payment_status) VALUES (?, ?, ?)",
             (datetime.now(), total, payment_status)
         )
+        
+        # Immediately fetch the ID
+        cursor.execute("SELECT CAST(SCOPE_IDENTITY() AS INT) AS new_id")
         new_id = cursor.fetchone()[0]
+        
         conn.commit()
         return new_id
     finally:
         cursor.close()
         conn.close()
+
 
 # --- Tests --- #
 
