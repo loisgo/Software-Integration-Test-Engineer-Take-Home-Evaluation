@@ -4,6 +4,7 @@ import pyodbc
 import pytest
 import time
 
+# Database connection string configuration
 DB_NAME = "MySalesDb"
 CONN_STR_MASTER = (
     "Driver={ODBC Driver 18 for SQL Server};"

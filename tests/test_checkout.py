@@ -60,8 +60,8 @@ def insert_test_sale(total, payment_status="Paid"):
 
 
 
-# --- Tests --- #
 
+# Test Scenario: Successful payment and database verification
 def test_checkout_successful_payment(requests_mock):
     print("\n--- Running Test For Successful Payment ---")
 
@@ -90,17 +90,18 @@ def test_checkout_successful_payment(requests_mock):
         status_code=200
     )
 
-    # Call the endpoints
+    # POST /checkout (add sales)
     checkout_response = requests.post(f"{BASE_URL}/checkout", json={"Items": items})
     body = checkout_response.json()
     assert body["total"] == pytest.approx(expected_total)
 
+    # POST /payment (successful payment)
     payment_payload = {"saleId": sale_id, "cardNumber": "00520205", "amount": body["total"]}
     payment_response = requests.post(f"{BASE_URL}/payment", json=payment_payload)
     payment_body = payment_response.json()
     assert payment_body["status"] == "Paid"
 
-    # Verify DB
+    # Verify Database Values
     row = execute_db_query("SELECT payment_status FROM sales_hdr WHERE id=?", sale_id)
     assert row is not None
     assert row[0] == "Paid"
@@ -136,17 +137,18 @@ def test_checkout_declined_payment(requests_mock):
         status_code=200
     )
 
-    # Call the endpoints
+    # POST /checkout (add sales)
     checkout_response = requests.post(f"{BASE_URL}/checkout", json={"Items": items})
     body = checkout_response.json()
     assert body["total"] == pytest.approx(expected_total)
 
-    payment_payload = {"saleId": sale_id, "cardNumber": "", "amount": body["total"]}
+     # POST /payment (declined payment)
+    payment_payload = {"saleId": sale_id, "cardNumber": "", "amount": body["total"]}    # "cardNumber": "12345oidwa"
     payment_response = requests.post(f"{BASE_URL}/payment", json=payment_payload)
     payment_body = payment_response.json()
     assert payment_body["status"] == "Declined"
 
-    # Verify DB
+    # Verify Database Values
     row = execute_db_query("SELECT payment_status FROM sales_hdr WHERE id=?", sale_id)
     assert row is not None
     assert row[0] == "Declined"
