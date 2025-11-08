@@ -1,8 +1,7 @@
 # Software Integration Test Engineer Take-Home Evaluation
 
-# Name: Lois Angelica B. Go
-
-# Job site you used to reach this repository: Indeed (RecruitGo)
+**Name: Lois Angelica B. Go**
+**Job site you used to reach this repository: Indeed (RecruitGo)**
 
 ## Overview
 
@@ -195,3 +194,32 @@ pytest --junitxml=reports/junit.xml \
 - Use `requests_mock` to mock `/checkout` and `/payment` endpoints in CI
 - Insert expected rows manually into `sales_hdr` for database assertions
 - Coverage reports highlight untested lines
+
+---
+
+## Project Delivery Summary
+
+**Scope Completed (Approx. 80%)**
+
+- Built checkout and payment workflow
+- Implemented pytest integration tests
+- Integrated SQL Server using pyodbc
+- Inserted records and validated payment status persistence in DB
+- Able to simulate both successful and declined payment scenarios
+- Repository structure + code maintainability prepared for scaling (fixtures, helpers, modular patterns)
+
+**Areas Not Fully Completed Yet**
+
+CI pipeline is not fully passing yet.
+There is additional debugging required on the CI environment regarding DB accessibility + environment config.
+
+**Next Steps (How I would complete the remaining 20%)**
+
+- Finalize CI pipeline execution with correct database setup / container DB (docker based local ephemeral DB or SQL Server linux container)
+- Isolate test execution layers to support both mocked and live execution modes
+
+**Notes for Reviewers**
+
+The core test workflows are functional and aligned with the expected integration testing behaviors. CI debugging was actively in progress but not blocking the main verification logic.
+
+I am happy to walk through my approach, design decisions, and next implementation steps during review / discussion.
